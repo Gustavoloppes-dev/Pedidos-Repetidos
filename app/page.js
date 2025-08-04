@@ -1,103 +1,124 @@
+"use client";
+
 import Image from "next/image";
+import PedidosCards from "./components/pedidosCards";
+import { useState } from "react";
+import ModalAlerta from "./components/ModalAlerta";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [pedidos, setPedidos] = useState([
+    // { numero: "v4504886fid-01", data: "01-08", hora: "15:47", unico: true },
+    // { numero: "v4504886fid-02", data: "01-08", hora: "15:47", unico: true },
+    // { numero: "v4504886fid-03", data: "01-08", hora: "15:47", unico: true },
+    // { numero: "v4504886fid-04", data: "01-08", hora: "15:47", unico: true },
+    // { numero: "v4504886fid-05", data: "01-08", hora: "15:47", unico: true },
+    // { numero: "v4504886fid-06", data: "01-08", hora: "15:47", unico: true },
+  ]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const [novoPedido, setNovoPedido] = useState("");
+  const [modalAberta, setmodalAberta] = useState(false);
+
+  const excluirPedido = (numero, hora) => {
+    setPedidos((prev) =>
+      prev.filter(
+        (pedido) => !(pedido.numero === numero && pedido.hora === hora)
+      )
+    );
+  };
+
+  const enviarPedido = (e) => {
+    e.preventDefault();
+    if (!novoPedido.trim()) return;
+
+    const pedidoExiste = pedidos.some((pedido) => pedido.numero === novoPedido);
+
+    if (pedidoExiste) {
+      // teste
+      const duplicado = {
+        numero: novoPedido,
+        data: dataHoje(),
+        hora: horaAgora(),
+        unico: false,
+      };
+
+      setPedidos(prev => [...prev, duplicado]);
+      setmodalAberta(true);
+    } else {
+      const pedidoObjeto = {
+        numero: novoPedido,
+        data: dataHoje(),
+        hora: horaAgora(),
+        unico: true
+      };
+      setPedidos((pedido) => [...pedido, pedidoObjeto]);
+      console.log("✅ Pedido cadastrado:", pedidoObjeto);
+    }
+
+    setNovoPedido("");
+  };
+
+  function dataHoje() {
+    const agora = new Date();
+    const dia = String(agora.getDate()).padStart(2, "0");
+    const mes = String(agora.getMonth() + 1).padStart(2, "0");
+    return `${dia}-${mes}`;
+  }
+
+  function horaAgora() {
+    return new Date().toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
+  return (
+    <section className="flex flex-col justify-center items-center h-full">
+      <h1 className="font-bold text-5xl pb-4">Pedidos</h1>
+      <div className="flex gap-3">
+        <div className="bg-menu-bg px-[38px] py-8 rounded-xl">
+          <div>
+            <ul className="flex">
+              <li className="pr-[35px]">Status</li>
+              <li className="pr-[114px]">Nº Pedido</li>
+              <li className="pr-[74px]">Data</li>
+              <li className="pr-">Hora</li>
+            </ul>
+            <span className="block h-0.5 w-full bg-preto mt-1 mb-7"></span>
+          </div>
+          <div className="bg-menu-bg  h-[486px] rounded-[20px] flex flex-col gap-6 pr-3 overflow-y-auto">
+            {pedidos.map((pedido, index) => (
+              <PedidosCards
+                key={index}
+                numero={pedido.numero}
+                data={pedido.data}
+                hora={pedido.hora}
+                unico={pedido.unico}
+                deletar={() => excluirPedido(pedido.numero, pedido.hora)}
+              />
+            ))}
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        <form
+          className="bg-menu-bg h-16 rounded-[10px] flex items-center justify-center"
+          onSubmit={enviarPedido}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+          <input
+            placeholder="Digite o codigo do pedido"
+            className="text-cinza-fonte-sm px-4 py-[15px] bg-cinza-claro-sm rounded-[8px]
+                focus:shadow-none focus:outline-none"
+            type="text"
+            id="nome"
+            onChange={(e) => setNovoPedido(e.target.value)}
+            value={novoPedido}
+            autoFocus
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        </form>
+      </div>
+      <ModalAlerta
+        aberto={modalAberta}
+        fechar={() => setmodalAberta(false)}
+        pedido={novoPedido}
+      />
+    </section>
   );
 }
