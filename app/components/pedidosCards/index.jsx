@@ -1,6 +1,6 @@
 import { MdDelete } from "react-icons/md";
 
-export default function PedidosCards({ numero, data, hora, unico, deletar }) {
+export default function PedidosCards({id, numero, data, hora, unico, deletar }) {
   return (
     // <div className="bg-bg-cinza-claro flex items-center gap-6 py-2 rounded-[13px] px-3">
     //   <span className="bg-verde h-[44px] w-2"></span>
@@ -28,7 +28,7 @@ export default function PedidosCards({ numero, data, hora, unico, deletar }) {
         <span className="text-2xl">{data}</span>
         <span className="text-2xl">{hora}</span>
         <button
-          onClick={deletar}
+          onClick={() => deletar(id)}
           className="p-2 hover:scale-110 transition-transform"
         >
           <MdDelete />

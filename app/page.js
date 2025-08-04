@@ -18,12 +18,8 @@ export default function Home() {
   const [novoPedido, setNovoPedido] = useState("");
   const [modalAberta, setmodalAberta] = useState(false);
 
-  const excluirPedido = (numero, hora) => {
-    setPedidos((prev) =>
-      prev.filter(
-        (pedido) => !(pedido.numero === numero && pedido.hora === hora)
-      )
-    );
+  const excluirPedido = (id) => {
+    setPedidos((prev) => prev.filter((pedido) => pedido.id !== id));
   };
 
   const enviarPedido = (e) => {
@@ -35,6 +31,8 @@ export default function Home() {
     if (pedidoExiste) {
       // teste
       const duplicado = {
+        // id: Math.random().toString(36).substring(2, 9),
+        id: Date.now(),
         numero: novoPedido,
         data: dataHoje(),
         hora: horaAgora(),
@@ -45,6 +43,7 @@ export default function Home() {
       setmodalAberta(true);
     } else {
       const pedidoObjeto = {
+        id: Date.now(),
         numero: novoPedido,
         data: dataHoje(),
         hora: horaAgora(),
@@ -89,6 +88,7 @@ export default function Home() {
             {pedidos.map((pedido, index) => (
               <PedidosCards
                 key={index}
+                id={pedido.id}
                 numero={pedido.numero}
                 data={pedido.data}
                 hora={pedido.hora}
