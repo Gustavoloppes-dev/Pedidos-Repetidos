@@ -93,7 +93,7 @@ export default function Home() {
                 data={pedido.data}
                 hora={pedido.hora}
                 unico={pedido.unico}
-                deletar={() => excluirPedido(pedido.numero, pedido.hora)}
+                deletar={() => excluirPedido(pedido.id)}
               />
             ))}
           </div>
