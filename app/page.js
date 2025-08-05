@@ -22,39 +22,80 @@ export default function Home() {
     setPedidos((prev) => prev.filter((pedido) => pedido.id !== id));
   };
 
-  const enviarPedido = (e) => {
-    e.preventDefault();
-    if (!novoPedido.trim()) return;
+  // const enviarPedido = (e) => {
+  //   e.preventDefault();
+  //   if (!novoPedido.trim()) return;
 
-    const pedidoExiste = pedidos.some((pedido) => pedido.numero === novoPedido);
+  //   const pedidoExiste = pedidos.some((pedido) => pedido.numero === novoPedido);
 
-    if (pedidoExiste) {
-      // teste
-      const duplicado = {
-        // id: Math.random().toString(36).substring(2, 9),
-        id: Date.now(),
-        numero: novoPedido,
-        data: dataHoje(),
-        hora: horaAgora(),
-        unico: false,
-      };
+  //   if (pedidoExiste) {
+  //     // teste
+  //     const duplicado = {
+  //       // id: Math.random().toString(36).substring(2, 9),
+  //       id: Date.now(),
+  //       numero: novoPedido,
+  //       data: dataHoje(),
+  //       hora: horaAgora(),
+  //       unico: false,
+  //     };
 
-      setPedidos(prev => [...prev, duplicado]);
-      setmodalAberta(true);
-    } else {
-      const pedidoObjeto = {
-        id: Date.now(),
-        numero: novoPedido,
-        data: dataHoje(),
-        hora: horaAgora(),
-        unico: true
-      };
-      setPedidos((pedido) => [...pedido, pedidoObjeto]);
-      console.log("✅ Pedido cadastrado:", pedidoObjeto);
-    }
+  //     setPedidos(prev => [...prev, duplicado]);
+  //     setmodalAberta(true);
+  //   } else {
+  //     const pedidoObjeto = {
+  //       id: Date.now(),
+  //       numero: novoPedido,
+  //       data: dataHoje(),
+  //       hora: horaAgora(),
+  //       unico: true
+  //     };
+  //     setPedidos((pedido) => [...pedido, pedidoObjeto]);
+  //     console.log("✅ Pedido cadastrado:", pedidoObjeto);
+  //   }
 
-    setNovoPedido("");
+  //   setNovoPedido("");
+  // };
+
+  const enviarPedido = async (e) => {
+  e.preventDefault();
+
+  if (!novoPedido.trim()) return;
+
+  // URL do seu Apps Script publicado
+  const apiUrl = "https://script.google.com/macros/s/AKfycbwGKIaDxIvIcqYHZXf4EC5wPQBfkd17YEkW_c6Fxp_cNdUm-xCOjEcXf8a5dy0ccS-I/exec";
+  const linkPlanilha = "https://docs.google.com/spreadsheets/d/1NK7gbw-WPvSm4a4YCpZAGs5yhlMIZkwvjDg6jqcTIX0/edit?usp=sharing";
+  const pagina = "Página1"; // Nome da aba
+  const celulas = "A1:C"; // Intervalo com Pedido, Data, Transportadora
+
+  // Faz requisição
+  const resp = await fetch(
+    `${apiUrl}?link=${encodeURIComponent(linkPlanilha)}&pagina=${pagina}&celulas=${celulas}`
+  );
+
+  const pedidosExistentes = await resp.json();
+
+  // Verifica duplicado
+  const jaExiste = pedidosExistentes.some(
+    (p) => p.pedido === novoPedido
+  );
+
+  if (jaExiste) {
+    setPedidoDuplicado(novoPedido);
+    setModalAberta(true);
+    return;
+  }
+
+  // Se não for duplicado, adiciona no estado
+  const novoObj = {
+    id: Date.now(),
+    numero: novoPedido,
+    data: getDataAtual(),
+    hora: getHoraAtual(),
+    unico: true
   };
+  setPedidos(prev => [...prev, novoObj]);
+  setNovoPedido("");
+};
 
   function dataHoje() {
     const agora = new Date();
